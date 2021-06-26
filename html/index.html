@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>File Processor</title>
+    <style>
+        #upload-button{
+            padding: 10px;
+            color: white;
+            background-color: #009578;
+            border: 1px solid black;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #upload-button:hover{
+            background-color: #00b28f;
+        }
+
+        #upload-info-text {
+            margin-left: 10px;
+            font-family: sans-serif;
+            color: #aaa;
+        }
+    </style>
+</head>
+
+<body>
+    <input type="file" id="uploaded-file" hidden="hidden">
+    <button type="button" id="upload-button">Choose a file</button>
+    <span id = "upload-info-text">No file chosen, yet</span>
+
+    <script type="text/javascript">
+        const inputFile = document.getElementById("uploaded-file");
+        const fileUploadBtn = document.getElementById("upload-button");
+        const customText = document.getElementById("upload-info-text");
+
+        fileUploadBtn.addEventListener("click", function(){
+            inputFile.click();
+        });
+
+        inputFile.addEventListener("change", function(){
+            if(inputFile.value){
+                debugger;
+                customText.innerHTML = inputFile.value.match(/[\/\\]([\w\d\s\.\-\(\)]+)$/)[1];
+            } else {
+                customText.innerHTML = "No file chosen, yet";
+            }
+        });
+
+</script>
+</body>
+</html>
