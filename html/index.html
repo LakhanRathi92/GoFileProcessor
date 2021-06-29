@@ -39,15 +39,19 @@
             inputFile.click();
         });
 
+        //assuming it will always be a csv file. 
         inputFile.addEventListener("change", function(){
             if(inputFile.value){
                 debugger;
                 customText.innerHTML = inputFile.value.match(/[\/\\]([\w\d\s\.\-\(\)]+)$/)[1];
+                let file = inputFile.files[0];
+                let formData = new FormData();     
+                formData.append("file", file);
+                fetch('http://127.0.0.1:9090/upload/file/', {method: "POST", body: formData});
             } else {
                 customText.innerHTML = "No file chosen, yet";
             }
         });
-
 </script>
 </body>
 </html>
