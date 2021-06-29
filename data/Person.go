@@ -2,6 +2,8 @@ package data
 
 import (
 	"context"
+	"encoding/json"
+	"mime/multipart"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -14,7 +16,9 @@ type Person struct {
 	Lastname  string             `json:"lastname,omitempty" bson:"lastname,omitempty"`
 }
 
-func StorePersonData(client *mongo.Client, person *Person) (result *mongo.InsertOneResult, err error) {
+func StorePersonData(client *mongo.Client, file multipart.File) (result *mongo.InsertOneResult, err error) {
+	var person Person
+	json.NewDecoder(file).Decode(&person)
 	collection := client.Database("MyApp").Collection("person")
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	result, err = collection.InsertOne(ctx, person)

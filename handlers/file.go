@@ -27,6 +27,7 @@ func (h *FileHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		fixCrossOrigin(rw, r)
 
 		file, header, err := r.FormFile("file")
+
 		if err != nil {
 			fmt.Println("Error Retrieving the File")
 			fmt.Println(err)
@@ -39,12 +40,13 @@ func (h *FileHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		h.l.Printf("File Size: %+v\n", header.Size)
 		h.l.Printf("MIME Header: %+v\n", header.Header)
 
-		var person data.Person
-		json.NewDecoder(file).Decode(&person)
-		result, err := data.StorePersonData(h.client, &person)
+		result, err := data.StorePersonData(h.client, file)
+
+		if err != nil {
+			h.l.Fatal(err)
+		}
 
 		json.NewEncoder(rw).Encode(result)
-
 	} else {
 		rw.WriteHeader(http.StatusMethodNotAllowed)
 	}
