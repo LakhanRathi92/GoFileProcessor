@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"os/signal"
 	"time"
 
 	"github.com/LakhanRathi92/GoFileProcessor/handlers"
@@ -21,18 +20,21 @@ func main() {
 
 	initDbConnection(l)
 	startServer(l)
-	close(l)
+	disconnectDb(l)
 }
 
-func close(l *log.Logger) {
-	if client == nil {
-		return
-	}
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-	err := client.Disconnect(ctx)
-	if err != nil {
-		l.Fatal(err)
-	}
+func startServer(l *log.Logger) {
+	l.Println("Initializing server...")
+	fileUploadHandler := handlers.NewFileHandler(l, client)
+	queryHandler := handlers.NewQueryHandler(l, client)
+
+	sm := http.NewServeMux()
+
+	sm.Handle("/", http.FileServer(http.Dir("./html")))
+	sm.Handle("/upload/", fileUploadHandler)
+	sm.Handle("/query/", queryHandler)
+
+	http.ListenAndServe("127.0.0.1:9090", sm)
 }
 
 func initDbConnection(l *log.Logger) {
@@ -40,7 +42,7 @@ func initDbConnection(l *log.Logger) {
 
 	var err error
 
-	client, err = mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
+	client, err = mongo.NewClient(options.Client().ApplyURI("mongodb://127.0.0.1:27017"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -50,47 +52,15 @@ func initDbConnection(l *log.Logger) {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 }
 
-func startServer(l *log.Logger) {
-	l.Println("Initializing server...")
-
-	var s *http.Server
-
-	sm := http.NewServeMux()
-
-	fileUploadHandler := handlers.NewFileHandler(l, client)
-	sm.Handle("/upload/file/", fileUploadHandler)
-
-	sm.Handle("/", http.FileServer(http.Dir("./html")))
-
-	s = &http.Server{
-		Addr:         "127.0.0.1:9090",
-		Handler:      sm,
-		IdleTimeout:  120 * time.Second,
-		ReadTimeout:  1 * time.Second,
-		WriteTimeout: 1 * time.Second,
+func disconnectDb(l *log.Logger) {
+	if client == nil {
+		return
 	}
-
-	go func() {
-		err := s.ListenAndServe()
-		if err != nil {
-			l.Fatal(err)
-		}
-	}()
-
-	//register OS signal
-	sigChan := make(chan os.Signal)
-	signal.Notify(sigChan, os.Interrupt)
-	signal.Notify(sigChan, os.Kill)
-
-	sig := <-sigChan
-
-	l.Println("Recieved terminate signal, graceful shutdown.... ", sig)
-
-	//graceful shutdown. Wait for 30 seconds on existing handlers.
-	tc, _ := context.WithTimeout(context.Background(), 30*time.Second)
-	s.Shutdown(tc)
-
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	err := client.Disconnect(ctx)
+	if err != nil {
+		l.Fatal(err)
+	}
 }

@@ -25,7 +25,6 @@ func NewFileHandler(l *log.Logger, client *mongo.Client) *FileHandler {
 func (h *FileHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 		fixCrossOrigin(rw, r)
-
 		file, header, err := r.FormFile("file")
 
 		if err != nil {
@@ -47,6 +46,7 @@ func (h *FileHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		}
 
 		json.NewEncoder(rw).Encode(result)
+
 	} else {
 		rw.WriteHeader(http.StatusMethodNotAllowed)
 	}
