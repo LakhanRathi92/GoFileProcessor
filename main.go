@@ -12,6 +12,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+//mongo.Client type is safe for concurrent use : https://developer.mongodb.com/community/forums/t/best-way-to-refactor-connection-overhead-from-my-handler-functions/3672
+//use it in all handlers.
 var client *mongo.Client
 
 func main() {
@@ -32,7 +34,7 @@ func startServer(l *log.Logger) {
 
 	sm.Handle("/", http.FileServer(http.Dir("./html")))
 	sm.Handle("/upload/", fileUploadHandler)
-	sm.Handle("/query/", queryHandler)
+	sm.Handle("/query", queryHandler)
 
 	http.ListenAndServe("127.0.0.1:9090", sm)
 }

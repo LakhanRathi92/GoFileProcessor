@@ -24,7 +24,10 @@ func NewFileHandler(l *log.Logger, client *mongo.Client) *FileHandler {
 //interface impl
 func (h *FileHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
+
 		fixCrossOrigin(rw, r)
+		rw.Header().Add("content-type", "application/json")
+
 		file, header, err := r.FormFile("file")
 
 		if err != nil {
@@ -54,7 +57,7 @@ func (h *FileHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 }
 
 func fixCrossOrigin(rw http.ResponseWriter, r *http.Request) {
-	rw.Header().Add("content-type", "application/json")
+
 	rw.Header().Set("Access-Control-Allow-Headers:", "*")
 	rw.Header().Set("Access-Control-Allow-Origin", "*")
 	rw.Header().Set("Access-Control-Allow-Methods", "*")

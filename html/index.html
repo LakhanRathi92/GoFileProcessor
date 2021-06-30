@@ -26,14 +26,27 @@
 </head>
 
 <body>
-    <input type="file" id="uploaded-file" hidden="hidden">
-    <button type="button" id="upload-button">Choose a file</button>
-    <span id = "upload-info-text">No file chosen, yet</span>
-
+    <p>
+        <input type="file" id="uploaded-file" hidden="hidden">
+        <button type="button" id="upload-button">Choose a file</button>
+        <span id = "upload-info-text">No file chosen, yet</span>
+    </p>
+    <p>
+        <button type="button" id="query-button">Search from firstname</button>
+        <input type="text" id="query" name="query">
+        <p>
+            <textarea id="queryresults" name="queryresults" rows="4" cols="50">
+            </textarea>
+        </p>
+    </p>
     <script type="text/javascript">
         const inputFile = document.getElementById("uploaded-file");
         const fileUploadBtn = document.getElementById("upload-button");
         const customText = document.getElementById("upload-info-text");
+
+
+        const inputQuery = document.getElementById("query");
+        const inputQueryBtn = document.getElementById("query-button");
 
         fileUploadBtn.addEventListener("click", function(){
             inputFile.click();
@@ -42,7 +55,7 @@
         //assuming it will always be a csv file. 
         inputFile.addEventListener("change", function(){
             if(inputFile.value){
-                debugger;
+                //debugger;
                 customText.innerHTML = inputFile.value.match(/[\/\\]([\w\d\s\.\-\(\)]+)$/)[1];
                 let file = inputFile.files[0];
                 let formData = new FormData();     
@@ -52,6 +65,20 @@
                 customText.innerHTML = "No file chosen, yet";
             }
         });
+
+        inputQueryBtn.addEventListener("click", function(){
+            debugger;
+            if(inputQuery.value){
+                console.log("http://127.0.0.1:9090/query?person=" + inputQuery.value);
+                fetch("http://127.0.0.1:9090/query?person=" + inputQuery.value).then(function(response) {
+                    response.text().then(function(text) {
+                        queryresults.textContent = text;
+                    });
+                });
+            } 
+        });
+
+
 </script>
 </body>
 </html>
