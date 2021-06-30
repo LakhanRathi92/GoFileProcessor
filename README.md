@@ -1,5 +1,5 @@
 # GoFileProcessor
-Allow a user to upload CSV documents and its contents are stored in MongoDB.
+Allow a user to upload json doc and its contents are stored in MongoDB. The fields are fixed so far. 
 
 ## Resources: 
 ### Go and MongoDB 
