@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <title>File Processor</title>
     <style>
-        #upload-button{
+        .upload-button{
             padding: 10px;
             color: white;
             background-color: #009578;
@@ -13,7 +13,7 @@
             cursor: pointer;
         }
 
-        #upload-button:hover{
+        .upload-button:hover{
             background-color: #00b28f;
         }
 
@@ -28,11 +28,11 @@
 <body>
     <p>
         <input type="file" id="uploaded-file" hidden="hidden">
-        <button type="button" id="upload-button">Choose a file</button>
+        <button type="button" id="upload-button" class="upload-button">Choose a file</button>
         <span id = "upload-info-text">No file chosen, yet</span>
     </p>
     <p>
-        <button type="button" id="query-button">Search from firstname</button>
+        <button type="button" id="query-button" class="upload-button">Search from firstname</button>
         <input type="text" id="query" name="query">
         <p>
             <textarea id="queryresults" name="queryresults" rows="4" cols="50">
