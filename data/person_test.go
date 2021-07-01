@@ -77,9 +77,15 @@ func TestStore(t *testing.T) {
 func TestRead(t *testing.T) {
 	personsFiltered, err := Read(client, firstname)
 	if err != nil {
-		t.Errorf("Failed read test %s :", err)
+		t.Errorf("Failed read test :%s", err)
 	}
-	t.Log(personsFiltered)
+
+	for _, value := range *personsFiltered {
+		if value.ID == _id {
+			t.Log("person exists :", value.ID)
+			break
+		}
+	}
 }
 
 func TestTearDown(t *testing.T) {

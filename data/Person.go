@@ -24,7 +24,11 @@ func (p *Person) Store(client *mongo.Client) (result *mongo.InsertOneResult, err
 }
 
 //reads all matching data where person's first name is given.
-func Read(client *mongo.Client, firstname string) (personsFiltered []bson.M, err error) {
+func Read(client *mongo.Client, firstname string) (*[]Person, error) {
+	var m bson.M
+
+	persons := make([]Person, 0, 10)
+
 	personCollection := client.Database("MyApp").Collection("person")
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	filterCursor, err := personCollection.Find(ctx, bson.M{"firstname": firstname})
@@ -33,11 +37,15 @@ func Read(client *mongo.Client, firstname string) (personsFiltered []bson.M, err
 		return nil, err
 	}
 
-	err = filterCursor.All(ctx, &personsFiltered)
+	err = filterCursor.All(ctx, &persons)
 	if err != nil {
 		return nil, err
 	}
-	return personsFiltered, err
+
+	bsonBytes, _ := bson.Marshal(m)
+	bson.Unmarshal(bsonBytes, &persons)
+
+	return &persons, err
 }
 
 //update a single person.
