@@ -1,5 +1,7 @@
 package handlers
 
+//reads data from file and creates person from it and calls store to store it in database.
+
 import (
 	"encoding/json"
 	"fmt"
@@ -10,7 +12,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-//simple handler
 type FileHandler struct {
 	l      *log.Logger
 	client *mongo.Client
@@ -42,7 +43,9 @@ func (h *FileHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		h.l.Printf("File Size: %+v\n", header.Size)
 		h.l.Printf("MIME Header: %+v\n", header.Header)
 
-		result, err := data.StorePersonData(h.client, file)
+		var p data.Person
+		json.NewDecoder(file).Decode(&p)
+		result, err := p.Store(h.client)
 
 		if err != nil {
 			h.l.Fatal(err)

@@ -1,13 +1,13 @@
 package handlers
 
+//handle incoming GET request to retrieve data.
+
 import (
-	"context"
 	"encoding/json"
 	"log"
 	"net/http"
-	"time"
 
-	"go.mongodb.org/mongo-driver/bson"
+	"github.com/LakhanRathi92/GoFileProcessor/data"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -17,7 +17,7 @@ type QueryHandler struct {
 	client *mongo.Client
 }
 
-//new file handler creation function
+//new Query handler creation function
 func NewQueryHandler(l *log.Logger, client *mongo.Client) *QueryHandler {
 	return &QueryHandler{l, client}
 }
@@ -25,32 +25,28 @@ func NewQueryHandler(l *log.Logger, client *mongo.Client) *QueryHandler {
 func (h *QueryHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 		rw.Header().Add("content-type", "application/json")
-
-		personCollection := h.client.Database("MyApp").Collection("person")
 		persons, ok := r.URL.Query()["person"]
 
+		//check query parameter.
 		if !ok || len(persons[0]) < 1 {
-			log.Println("Url Param 'person' is missing")
+			h.l.Println("Url Param 'person' is missing")
+			json.NewEncoder(rw).Encode("Url Param 'person' is missing")
 			return
 		}
 
 		person := persons[0]
-		log.Println("Url Param 'person' request: " + person)
+		h.l.Println("Url Param 'person' request: " + person)
 
-		ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-		filterCursor, err := personCollection.Find(ctx, bson.M{"firstname": person})
-
+		personsFiltered, err := data.Read(h.client, person)
 		if err != nil {
-			log.Fatal(err)
+			h.l.Print("no users found. ")
+			json.NewEncoder(rw).Encode("no users found")
 		}
-
-		var personsFiltered []bson.M
-		if err = filterCursor.All(ctx, &personsFiltered); err != nil {
-			log.Fatal(err)
+		if personsFiltered != nil {
+			json.NewEncoder(rw).Encode(personsFiltered)
+		} else {
+			json.NewEncoder(rw).Encode("no users found with matching first name: " + person)
 		}
-
-		json.NewEncoder(rw).Encode(personsFiltered)
-
 	} else {
 		rw.WriteHeader(http.StatusMethodNotAllowed)
 	}
