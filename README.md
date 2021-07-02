@@ -28,3 +28,9 @@ https://gobyexample.com/signals
 
 ### Tests
 go test ./data/... -v
+
+
+### Use case 1 
+  via postman : Get request 127.0.0.1:9090/query?person={Firstname}
+### Use case 2
+  via postman : post the sample file or likes of it at : 127.0.0.1:9090/create/
