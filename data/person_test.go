@@ -57,17 +57,17 @@ func TestStore(t *testing.T) {
 	_id = result.InsertedID.(primitive.ObjectID)
 
 	if err != nil {
-		t.Errorf("Failed store test %s", err)
+		t.Fatalf("Failed store test %s", err)
 	}
 
 	if p.Firstname != firstname {
-		t.Errorf("Failed store test %s", err)
+		t.Fatalf("Failed store test %s", err)
 	}
 
 	t.Log("Person was successfully stored : "+p.Firstname+" "+p.Lastname+" inserted id: ", _id)
 
 	if err != nil {
-		t.Errorf("Failed store test %s", err)
+		t.Fatalf("Failed store test %s", err)
 	}
 
 }
@@ -77,13 +77,15 @@ func TestStore(t *testing.T) {
 func TestRead(t *testing.T) {
 	personsFiltered, err := Read(client, firstname)
 	if err != nil {
-		t.Errorf("Failed read test :%s", err)
+		t.Fatalf("Failed read test :%s", err)
 	}
 
 	for _, value := range *personsFiltered {
 		if value.ID == _id {
 			t.Log("person exists :", value.ID)
 			break
+		} else {
+			t.Fatalf("Failed read test. ")
 		}
 	}
 }
@@ -95,6 +97,7 @@ func TestTearDown(t *testing.T) {
 
 	if err != nil {
 		t.Log(err)
+		t.Fatalf("Failed to clean up resources :%s", err)
 	}
 	t.Log("Person was successfully removed : ", _id)
 }
